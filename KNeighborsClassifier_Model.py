@@ -27,7 +27,7 @@ predicted_labels = kNeighbour_model.predict(feature_test_scaled)
 
 # --------------------------------------------- EVALUATION METRICS -----------------------------------------------------
 
-kmm_accuracy_score = accuracy_score(target_test, predicted_labels)
+knn_accuracy_score = accuracy_score(target_test, predicted_labels)
 knn_precision = precision_score(target_test, predicted_labels)
 knn_recall = recall_score(target_test, predicted_labels)
 knn_f1_score = f1_score(target_test, predicted_labels)
@@ -37,7 +37,7 @@ print("-" * 45) # Visual seperator
 print("-*- KNN PERFORMANCE METRICS -*-")
 print("-" * 45)
 
-print(f"Accuracy  : {kmm_accuracy_score:.4f}")
+print(f"Accuracy  : {knn_accuracy_score:.4f}")
 print(f"Precision : {knn_precision:.4f}")
 print(f"Recall    : {knn_recall:.4f}")
 print(f"F1-Score  : {knn_f1_score:.4f}")

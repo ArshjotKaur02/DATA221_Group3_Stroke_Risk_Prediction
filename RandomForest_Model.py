@@ -29,8 +29,56 @@ Information accessed from: https://www.youtube.com/watch?v=Wj3qfSyRHys
 """
 
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
 
 #Importing processed data from Stroke_Data_Processing.py
 from Stroke_Data_Processing import feature_train, feature_test, target_train, target_test
+
+# ----------------------------------------- TRAIN THE RANDOM FOREST MODEL ----------------------------------------------
+
+# n_estimators = 100
+#   Counts of decision trees. More trees means more stable predictions, but slower to train
+
+# max_depth = 10
+#   Limiting depth acts as regularization to prevents overfitting
+
+# max_features= "sqrt"
+#   Number of features randomly selected at each split.
+#   "sqrt" means square root of total features. For 10 features → ~3 features per split
+#   This is one of the two randomness that makes trees different from each other
+
+# class_weight = "balanced"
+#   "balanced" adjusts the weight of each class inversely to its frequency
+#   This prevents the model from ignoring the minority class, as in this case class 1
+
+# random_state=42
+#   Setting this ensures reproducible results every run.
+
+# Information on training Random Forest was accessed from:
+# https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html
+
+random_forest_model = RandomForestClassifier(n_estimators = 100, max_depth= 10, max_features="sqrt",
+                                             class_weight="balanced", random_state=42)
+
+random_forest_model.fit(feature_train, target_train)
+predicted_labels = random_forest_model.predict(feature_test)
+
+# --------------------------------------------- EVALUATION METRICS -----------------------------------------------------
+
+random_forest_accuracy = accuracy_score(target_test, predicted_labels)
+random_forest_precision = precision_score(target_test, predicted_labels)
+random_forest_recall = recall_score(target_test, predicted_labels)
+random_forest_f1_score = f1_score(target_test, predicted_labels)
+random_forest_confusion_matrix = confusion_matrix(target_test, predicted_labels)
+
+print("-" * 45) # Visual seperator
+print("-*- RANDOM FOREST PERFORMANCE METRICS -*-")
+print("-" * 45)
+
+print(f"Accuracy  : {random_forest_accuracy:.4f}")
+print(f"Precision : {random_forest_precision:.4f}")
+print(f"Recall    : {random_forest_recall:.4f}")
+print(f"F1-Score  : {random_forest_f1_score:.4f}")
+
+print("\nConfusion Matrix:")
+print(random_forest_confusion_matrix)
