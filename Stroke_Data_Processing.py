@@ -15,7 +15,7 @@ The dataset is highly imbalanced, with roughly 4.9% (249)positive stroke cases.
 # Importing the required libraries
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
+
 
 # Using pd.read_csv() to reads stroke data CSV file into a DataFrame
 patient_records_dataframe = pd.read_csv("healthcare_stroke_data.csv")
@@ -64,7 +64,7 @@ patient_records_dataframe = pd.get_dummies(patient_records_dataframe,
 
 # -------------------------------------- SEPARATING FEATURE MATRIX -----------------------------------------------------
 
-feature_matrix = patient_records_dataframe.drop(columns=["stroke"]) #All 11 feature columns except stroke
+feature_matrix = patient_records_dataframe.drop(columns=["stroke"]) #All 10 feature columns except stroke
 target_label = patient_records_dataframe["stroke"]  #Only the stroke column
 
 # -------------------------------------- SPLITTING TRAIN TEST DATA -----------------------------------------------------
@@ -76,12 +76,3 @@ target_label = patient_records_dataframe["stroke"]  #Only the stroke column
 
 feature_train, feature_test, target_train, target_test = train_test_split(feature_matrix, target_label,
                                                             test_size = 0.3, random_state = 42, stratify = target_label)
-
-# -------------------------------------- FEATURE SCALING FOR KNN -------------------------------------------------------
-
-# Some input features have very different ranges, for instance age vs glucose level. As a result one feature with bigger
-# range will dominate computations, specifically for distance based models. Feature scaling will put features on a
-# comparable scale around 0.
-
-scaler = StandardScaler()
-X_train_scaled = scaler.fit_transform(feature_train)  #Learn mean/std from train, then scale it
