@@ -71,3 +71,42 @@ for criterion in parameter_grid["criterion"]:
 
                 trial_tree_model.fit(feature_train_sub, target_train_sub)
                 validation_prediction = trial_tree_model.predict(feature_validation)
+
+                validation_recall = recall_score(target_validation, validation_prediction, zero_division=0)
+                validation_f1 = f1_score(target_validation, validation_prediction, zero_division=0)
+
+                better_recall_score = validation_recall > best_validation_recall
+                tie_with_better_f1 = (validation_recall == best_validation_recall and validation_f1 > best_validation_f1) # If recall score is the same, we prefer precision/recall balance
+
+                if better_recall_score or tie_with_better_f1:
+                    best_validation_recall = validation_recall
+                    best_validation_f1 = validation_f1
+
+                    # save the winning parameters
+                    best_parameters = {"criterion": criterion, "max_depth": max_depth, "min_samples_split": min_samples_split, "min_samples_leaf": min_samples_leaf}
+
+# Rebuild the model with the best validation setting and refit the model on full training set
+final_decision_tree_model = DecisionTreeClassifier(**best_parameters, class_weight="balanced", random_state=42)
+final_decision_tree_model.fit(feature_train, target_train)
+
+print('-' * 50)
+print(f'-*- Decision Tree Tuning Summary -*-')
+print('-' * 50)
+print(f"Best Validation Recall : {best_validation_recall:.4f}")
+print(f"Best Validation F1     : {best_validation_f1:.4f}")
+print(f"Best Parameters        : {best_parameters}")
+print()
+
+tuning_result = model_evaluate("Tuned Decision Tree", final_decision_tree_model, feature_test, target_test)
+
+# Feature importance value show how much each feature contributes
+# to reduce the impurity in the fitted tree
+# helps shows what drove predictions in the final discussion
+feature_importance_dataframe = pd.DataFrame(
+    {"feature": feature_train.columns, "importance": final_decision_tree_model.feature_importances_
+     }).sort_values(by="importance", ascending=False)
+
+print("-" * 50)
+print("-*- 10 most important features (Tuned Decision Tree) -*-")
+print("-" * 50)
+print(feature_importance_dataframe.head(10).to_string(index=False))
