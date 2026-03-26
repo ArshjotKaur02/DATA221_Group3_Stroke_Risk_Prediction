@@ -29,10 +29,10 @@ scale_positive_weight = negative_count / positive_count
 #   reg_lambda        – L2 regularisation on leaf weights (smoothing)
 #   scale_pos_weight  – balances positive/negative class weights natively
 
-#Paramaters adjusted for highest recall right now
+#Paramaters adjusted for higher recall while maintaining other metrics
 xgboost_model = xgboost.XGBClassifier(
     n_estimators=500,
-    learning_rate=0.01,
+    learning_rate=0.05,
     max_depth=4,
     subsample=0.7,
     colsample_bytree=0.8,
