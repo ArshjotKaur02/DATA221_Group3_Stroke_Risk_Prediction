@@ -54,13 +54,13 @@ xgboost_model.fit(
 )
 
 target_prediction = xgboost_model.predict(feature_test)
-target_prediction_proba = xgboost_model.predict_proba(feature_test)[:, 1]
+target_prediction_probability = xgboost_model.predict_proba(feature_test)[:, 1]
 
 
 # A lower threshold improves recall on the minority stroke class
 # at the cost of more false positives
 THRESHOLD = 0.3
-target_prediction_adjusted = (target_prediction_proba >= THRESHOLD).astype(int)
+target_prediction_adjusted = (target_prediction_probability >= THRESHOLD).astype(int)
 
 xgboost_accuracy = accuracy_score(target_test, target_prediction_adjusted)
 xgboost_precision = precision_score(target_test, target_prediction_adjusted)
