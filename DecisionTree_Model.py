@@ -1,3 +1,5 @@
+# ----------------------------------------- IMPORT ----------------------------------------------
+
 import pandas as pd
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import train_test_split
@@ -10,6 +12,8 @@ The model will be evaluated using the same metrics as all other models for fair 
 
 zero_division=0 prevents runtime warnings in rare cases where a model predicts no positive class at all since this is an imbalanced datasets
 """
+
+# ----------------------------------------- MODEL EVALUATION HELPER ----------------------------------------------
 def model_evaluate(model_name, trained_model, test_features, true_labels):
     predicted_labels = trained_model.predict(test_features)
     predicted_probabilities = trained_model.predict_proba(test_features)[:, 1]
@@ -34,12 +38,14 @@ def model_evaluate(model_name, trained_model, test_features, true_labels):
     print()
 
     return {"accuracy": accuracy, "precision": precision, "recall": recall, "f1_score": f1, "roc_auc": roc_auc}
-
+# ----------------------------------------- BASELINE MODEL ----------------------------------------------
 # Model setup: class_weight="balanced" increases penalty for minority class errors, help the model pay attention to rare stroke cases
 decision_tree_model = DecisionTreeClassifier(random_state=4, class_weight="balanced")
 decision_tree_model.fit(feature_train, target_train) # train the model on full training split
 decision_tree_model_results = model_evaluate("Decision Tree", decision_tree_model, feature_test, target_test)
 
+
+# ----------------------------------------- HYPERPARAMETER TUNING ----------------------------------------------
 # Hyperparameter Tuning
 # Step 1: Split training set into a smaller subset for training and validation
 # Step 2: Train on multiple parameters combinations
@@ -100,6 +106,7 @@ print(f"Best Validation F1     : {best_validation_f1:.4f}")
 print(f"Best Parameters        : {best_parameters}")
 print()
 
+# ----------------------------------------- FEATURE IMPORTANCE ----------------------------------------------
 tuning_result = model_evaluate("Tuned Decision Tree", final_decision_tree_model, feature_test, target_test)
 
 # Feature importance value show how much each feature contributes
