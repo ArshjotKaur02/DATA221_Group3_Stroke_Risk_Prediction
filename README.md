@@ -1,82 +1,106 @@
-# DATA221_Group3_Stroke_Risk_Prediction
-Machine learning project for predicting stroke risk using health indicators, including data preprocessing, model comparison, and evaluation.
+# Stroke Risk Prediction - DATA 221 Group Project
+
+Predicting whether a patient is at risk of stroke using six machine learning models trained on the 
+[Kaggle Stroke Prediction Dataset](https://www.kaggle.com/datasets/fedesoriano/stroke-prediction-dataset).
+
+## The Problem
+
+Stroke is one of the leading causes of death and long-term disability worldwide. Early identification of high-risk 
+patients allows for preventive intervention. This project builds and compares different ML classifiers on a dataset of 
+5,110 patient records to determine which model best identifies stroke risk from routine health indicators.
+
+The core challenge is class imbalance. Only around 4.9% of patients (249 of 5,110) experienced a stroke. A naive model 
+that always predicts "no stroke" would achieve approximately 95% accuracy, while being completely useless medically. 
+We tried to address this issue in data processing.
+
+## Dataset
+
+| Property | Value                                |
+|---|--------------------------------------|
+| Source | Kaggle: stroke-prediction-dataset    |
+| Records | 5,110 patients                       |
+| Features | 11 input features + 1 target         |
+| Target | `stroke` (0 = no stroke, 1 = stroke) |
+| Imbalance | ~4.9% positive (stroke) cases        |
+
+**Features used:**
+- Numeric: `age`, `avg_glucose_level`, `bmi`
+- Binary: `hypertension`, `heart_disease`, `ever_married`, `Residence_type`
+- Categorical: `gender`, `work_type`, `smoking_status`
 
 
-------------------------- LOGISTIC REGRESSION MODEL -------------------------
-Background and Dataset:
-The dataset used in this project is the Stroke Prediction Dataset sourced from 
-Kaggle, containing 5,110 patient records. Each record has 11 input features and
-one target variable indicating whether the patient had a stroke. The features 
-cover a mix of numeric data including age, BMI, and average glucose level, binary
-data including hypertension, heart disease, marital status, categorical data 
-including gender, work type, residence type, and smoking status. The dataset is 
-heavily imbalanced, with only 249 out of 5,110 patients having experienced a 
-stroke, making up approximately 4.9% of the data.
+## Project Structure
+```
+- Stroke_Data_Processing.py      # Includes data cleanup and train/test split
+- LogisticRegression_Model.py    # Model 1: Logistic Regression
+- KNeighborsClassifier_Model.py  # Model 2: K-Nearest Neighbors
+- DecisionTree_Model.py          # Model 3: Decision Tree
+- Neural_Net_Model.py            # Model 4: Neural Network
+- RandomForest_Model.py          # Model 5: Random Forest
+- Stroke_Gradient_Boosting.py    # Model 6: Gradient Boosting
+- healthcare_stroke_data.csv     # Raw dataset (place in same folder)
+- README.md                      # This file
+```
 
-Data Preprocessing:
-Before training the model, several preprocessing steps were carried out to
-ensure the data was clean and in a format the model could work with. The first
-issue addressed was missing data. The BMI column contained approximately 201
-missing values that were stored as the test "N/A" rather than actual empty cells.
-These were first converted to proper missing values using pandas, and then filled
-in using the median BMI of the dataset. The median was chosen over the mean because
-it is not affected by extreme outlier values, making it a more reliable representation
-of the typical BMI in the dataset. Rows with missing values were not deleted because
-doing so would have removed a significant portion of the data. The second step 
-involved encoding categorical variables. Columns with only two possible values, 
-specifically marital status and residence type, were converted to binary numbers
-where 1 represented Yes or Urban and 0 represented No or Rural. For columns with more
-than two categories, specifically gender, work type, and smoking status, One-Hot Encoding
-was applied. This technique creates a separate binary column for each category.
-The first category in each group was dropped to avoid a redundancy issue known as the 
-dummy variable trap, where one column can be perfectly predicted from the others.
-Finally, the dataset was split into a training set containing 70% of the data and 
-a test set containing the remaining 30%. The split was stratified, meaning the proportion
-of stroke cases was kept the same in both sets, which is important given how imbalanced 
-the data is. 
+## Data Processing
 
-Model Design and Justification:
-Logistic Regression was chosen as the modelling technique because it is well suited
-to binary classification problems, in this case predicting either stroke or no
-stroke. It is also interpretable, meaning we can directly examine the model's coefficients
-to understand which features are driving predictions. Several important design 
-decisions were made when setting up the model. Feature scaling was applied using a 
-Standard Scaler, which transforms each feature to have a mean of zero and a standard
-deviation of one. This step was necessary because Logistic Regression is sensitive
-to features being on very different scales. For example, age ranges from 0 to 100 while
-average glucose level ranges from roughly 50 to 280. Without scaling, the model's 
-optimization process could be distorted. Critically, the scaler was fitted only on the 
-training data and then applied to the test data, to prevent data leakage where
-information from the test set influences the model. To address the class imbalance, 
-the model was configured with balanced class weighting. This automatically adjusts the 
-penalty the model receives for misclassifying each class, giving mush higher weight to the 
-minority stroke class. Without this, the model would likely learn to predict no stroke
-for every patient and still appear to be around 95% accurate, which would be completely 
-useless in a real medical setting. The model was trained using the LBFGS solver, a 
-quasi-Newton optimization algorithm that is efficient and reliable for datasets of 
-this size. The maximum number of iterations was set to 1,000 to give the solver enough
-steps to fully converge on a solution.
+| Step                   | What                                    | Why                                                                                                         |
+|------------------------|-----------------------------------------|-------------------------------------------------------------------------------------------------------------|
+| Drop `id` column       | Remove row identifier                   | It has no medical meaning; keeping it lets the model "memorise" row numbers                                 |
+| Missing data values    | Replace text "N/A" with median          | There were around 201 missing values. Median is used since it is resistant to outliers unlike mean          |
+| Binary encoding        | `ever_married`, `Residence_type` to 0/1 | Two-category columns need no ordering; direct mapping to 0 and 1                                            |
+| One-Hot Encoding       | `gender`, `work_type`, `smoking_status` | More than 2 categories. Assigning numbers (1,2,3) would imply a false order                                 |
+| 70/30 stratified split | `train_test_split` with `stratify`      | Ensures the 4.9% stroke proportion is preserved in both splits; `random_state=42` makes every run identical |
 
-Results and Evaluation:
-The model was evaluated using several metrics rather than just accuracy, because accuracy
-alone is misleading on imbalanced datasets. The ROC-AUC score was 0.839, which measures 
-the model's ability to correctly rank stroke patients above non-stroke patients across all
-possible decision thresholds. A score of 0.5 would represent random guessing and a score of
-1.0 would be perfect, so 0.839 indicates the model has strong discriminative ability. Looking 
-at the classification report, the model achieved a recall of 79% on the stroke class, meaning 
-it correctly identified 79 out of every 100 actual stroke cases. This is the most important
-metric in a medical screening context because missing a real stroke case, known as a false
-negative, carries far greater consequences than incorrectly flagging a healthy patient, known
-as a false positive. The precision on the stroke class was 13%, which reflects the trade-off
-made by using balanced class weighting. The model is intentionally cautious, raising
-more alerts on order to avoid missing real cases. 
 
-Feature Importance:
-After scaling, the model's coefficients reveal which features had the greatest influence
-on stroke predictions. Age had by far the highest coefficient at 1.90, meaning it was the 
-single strongest predictor of stroke risk in the model. Average glucose level was the second
-most impactful numeric feature with a coefficient of 0.20, followed by hypertension
-at 0.16. Smoking status also appeared among the top features, with currently smoking increasing
-risk and never having smoked decreasing it. These findings are consistent with established
-medical research on stroke risk factors, which adds confidence that the model has learned 
-meaningful patterns from the data rather than noise. 
+## Evaluation Metrics
+
+### Why accuracy is misleading here
+
+If a model predicts "no stroke" for every patient, it gets **95% accuracy** while catching zero stroke cases. Accuracy 
+is useless as a primary metric on imbalanced data.
+
+### The metrics that matter
+
+| Metric | Formula | What it tells you                                                                                     |
+|---|---|-------------------------------------------------------------------------------------------------------|
+| **Recall** | TP / (TP + FN) | Of all actual stroke patients, how many did we catch? Most important as a missed stroke can be fatal. |
+| **Precision** | TP / (TP + FP) | Of all patients we flagged, how many truly had a stroke?                                              |
+| **F1-Score** | 2 × (P × R) / (P + R) | Harmonic mean of Precision and Recall. Useful single summary.                                         |
+| **ROC-AUC** | Area under ROC curve | Tests the model at every possible threshold. It is not affected by class imbalance.                   |
+
+### Confusion Matrix 
+
+**Confusion Matrix** is a snapshot at one specific threshold.
+
+```
+                  Predicted NO    Predicted YES
+Actual NO  :         TN               FP   (false alarm)
+Actual YES :         FN               TP   (caught stroke)
+                  (missed stroke)
+```
+
+## Limitations
+
+- **Dataset size**: 5,110 records is small for medical ML. Models may not generalise well to different populations.
+- **Class imbalance**: Even with weighting, 249 positive cases limits how much the model can learn about stroke patterns.
+- **Missing data**: 201 BMI values were imputed with the median. Real patient BMI values may differ.
+- **No external validation**: All evaluation is on one held-out test set from the same dataset. Performance on new patients is unknown.
+
+
+## Partner Contributions
+
+| Member | Contribution                      |
+|---|-----------------------------------|
+| A. Kaur | KNN, Random Forest                |
+| A. Spring | Logistic Regression               |
+| L. Nguyen | Decision Tree                     |
+| U. Haris | Neural Network, Gradient Boosting |
+
+## References
+
+- Stroke Prediction Dataset. Kaggle. https://www.kaggle.com/datasets/fedesoriano/stroke-prediction-dataset
+- GeeksforGeeks - `pd.to_numeric()`: https://www.geeksforgeeks.org/python/python-pandas-to_numeric-method/
+- GeeksforGeeks - `pd.get_dummies()`: https://www.geeksforgeeks.org/pandas/python-pandas-get_dummies-method/
+- Random Forest explanation: https://www.youtube.com/watch?v=Wj3qfSyRHys
+- Hyperparameter tuning Decision Trees: https://www.geeksforgeeks.org/machine-learning/how-to-tune-a-decision-tree-in-hyperparameter-tuning/
