@@ -106,9 +106,9 @@ print(f"Best Validation F1     : {best_validation_f1:.4f}")
 print(f"Best Parameters        : {best_parameters}")
 print()
 
-# ----------------------------------------- FEATURE IMPORTANCE ----------------------------------------------
 tuning_result = model_evaluate("Tuned Decision Tree", final_decision_tree_model, feature_test, target_test)
 
+# ----------------------------------------- FEATURE IMPORTANCE ----------------------------------------------
 # Feature importance value show how much each feature contributes
 # to reduce the impurity in the fitted tree
 # helps shows what drove predictions in the final discussion
