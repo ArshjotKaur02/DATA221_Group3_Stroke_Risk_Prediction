@@ -29,7 +29,7 @@ Information accessed from: https://www.youtube.com/watch?v=Wj3qfSyRHys
 """
 
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, roc_auc_score
 
 #Importing processed data from Stroke_Data_Processing.py
 from Stroke_Data_Processing import feature_train, feature_test, target_train, target_test
@@ -62,13 +62,15 @@ random_forest_model = RandomForestClassifier(n_estimators = 100, max_depth= 10, 
 
 random_forest_model.fit(feature_train, target_train)
 predicted_labels = random_forest_model.predict(feature_test)
+predicted_probability = random_forest_model.predict_proba(feature_test)[:,1]
 
 # --------------------------------------------- EVALUATION METRICS -----------------------------------------------------
 
 random_forest_accuracy = accuracy_score(target_test, predicted_labels)
-random_forest_precision = precision_score(target_test, predicted_labels)
-random_forest_recall = recall_score(target_test, predicted_labels)
-random_forest_f1_score = f1_score(target_test, predicted_labels)
+random_forest_precision = precision_score(target_test, predicted_labels, zero_division=0)
+random_forest_recall = recall_score(target_test, predicted_labels, zero_division=0)
+random_forest_f1_score = f1_score(target_test, predicted_labels, zero_division=0)
+random_forest_roc_auc_score = roc_auc_score(target_test, predicted_probability)
 random_forest_confusion_matrix = confusion_matrix(target_test, predicted_labels)
 
 print("-" * 45) # Visual seperator
@@ -79,6 +81,7 @@ print(f"Accuracy  : {random_forest_accuracy:.4f}")
 print(f"Precision : {random_forest_precision:.4f}")
 print(f"Recall    : {random_forest_recall:.4f}")
 print(f"F1-Score  : {random_forest_f1_score:.4f}")
+print(f"ROC-AUC   : {random_forest_roc_auc_score:.4f}")
 
 print("\nConfusion Matrix:")
 print(random_forest_confusion_matrix)
