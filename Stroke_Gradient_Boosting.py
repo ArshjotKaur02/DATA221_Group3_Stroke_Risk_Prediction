@@ -4,7 +4,7 @@ Imports preprocessed splits directly from Stroke_Data_Processing.py
 """
 
 import xgboost
-from sklearn.metrics import  accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
+from sklearn.metrics import  accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, roc_auc_score
 
 from Stroke_Data_Processing import (
     feature_train, feature_test,
@@ -67,6 +67,7 @@ xgboost_precision = precision_score(target_test, target_prediction_adjusted)
 xgboost_recall = recall_score(target_test, target_prediction_adjusted)
 xgboost_f1_score = f1_score(target_test, target_prediction_adjusted)
 xgboost_confusion_matrix = confusion_matrix(target_test, target_prediction_adjusted)
+xgboost_roc_auc = roc_auc_score(target_test, target_prediction_probability)
 
 
 
@@ -75,3 +76,4 @@ print(f"Precision : {xgboost_precision:.4f}")
 print(f"Recall    : {xgboost_recall:.4f}")
 print(f"F1-Score  : {xgboost_f1_score:.4f}")
 print(f"Confusion Matrix:\n{xgboost_confusion_matrix}")
+print(f"ROC-AUC   : {xgboost_roc_auc:.4f}")
