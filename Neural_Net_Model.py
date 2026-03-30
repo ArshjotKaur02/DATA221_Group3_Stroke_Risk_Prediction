@@ -3,7 +3,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout, BatchNormalization
 from tensorflow.keras.callbacks import EarlyStopping
 from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, roc_auc_score
 
 from Stroke_Data_Processing import (
     feature_train, feature_test,
@@ -60,7 +60,7 @@ neural_net_model.compile(
     metrics=["accuracy"]
 )
 
-neural_net_model.summary()
+
 
 # EarlyStopping monitors validation loss and stops training if
 # it does not improve for 20 consecutive epochs, then restores
@@ -75,7 +75,7 @@ early_stopping = EarlyStopping(
 
 
 
-history = neural_net_model.fit(
+neural_net_model.fit(
     feature_train_scaled, target_train,
     epochs=200,
     batch_size=32,
@@ -101,6 +101,7 @@ nn_precision        = precision_score(target_test, target_prediction_adjusted)
 nn_recall           = recall_score(target_test, target_prediction_adjusted)
 nn_f1_score         = f1_score(target_test, target_prediction_adjusted)
 nn_confusion_matrix = confusion_matrix(target_test, target_prediction_adjusted)
+nn_roc_auc = roc_auc_score(target_test, target_prediction_probability)
 
 
 print(f"Accuracy  : {nn_accuracy:.4f}")
@@ -108,3 +109,4 @@ print(f"Precision : {nn_precision:.4f}")
 print(f"Recall    : {nn_recall:.4f}")
 print(f"F1-Score  : {nn_f1_score:.4f}")
 print(f"Confusion Matrix:\n{nn_confusion_matrix}")
+print(f"ROC-AUC   : {nn_roc_auc:.4f}")
